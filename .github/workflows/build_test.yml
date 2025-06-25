@@ -39,10 +39,8 @@ jobs:
       with:
         xcode-version: 'latest' # Or specify a version like '15.0'
 
-    - name: Install CMake (if not suitable version is present)
-      uses: jwlawson/actions-setup-cmake@v1.14 # Or ensure CMake is available
-      with:
-        cmake-version: '3.15...' # Minimum version
+    - name: Install CMake via Homebrew
+      run: brew install cmake
 
     - name: Create build directory
       run: cmake -E make_directory ${{ github.workspace }}/build
