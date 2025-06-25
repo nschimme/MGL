@@ -1,10 +1,9 @@
 # test_mgl (for test_mgl_glfw) CMakeLists.txt
 
-if(NOT APPLE AND NOT EXISTS "${CMAKE_SOURCE_DIR}/test_mgl_glfw.entitlements")
-    # This target is heavily macOS specific due to bundling and entitlements.
-    # If we are not on Apple OR the entitlements file (a strong indicator of macOS app) isn't there, skip.
-    # The main.cpp might be cross-platform, but its current setup is for a macOS app.
-    message(STATUS "Skipping test_mgl_glfw build on non-Apple platform or if entitlements are missing.")
+if(NOT APPLE)
+    # This target is configured as a macOS App Bundle and uses entitlements,
+    # making it highly specific to macOS.
+    message(STATUS "Skipping test_mgl_glfw (macOS App Bundle test) build on non-Apple platform.")
     return()
 endif()
 
