@@ -1,0 +1,72 @@
+name: Build and Test MGL
+
+on:
+  push:
+    branches: [ main, master ] # Adjust as per your main branch name
+  pull_request:
+    branches: [ main, master ] # Adjust as per your main branch name
+
+jobs:
+  build-test-macos:
+    name: Build on ${{ matrix.os }} (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14] # macos-13 is Intel, macos-14 is Apple Silicon (usually)
+        # We will set CMAKE_OSX_ARCHITECTURES explicitly based on a variable
+        # For macos-13, it's typically x86_64. For macos-14, it's arm64.
+        # GitHub Actions runner images:
+        # macos-13: Intel (x86_64)
+        # macos-14: Apple Silicon (arm64)
+        # We can use a condition or map to set the architecture.
+        include:
+          - os: macos-13
+            arch: x86_64
+            target_arch: "x86_64"
+          - os: macos-14
+            arch: arm64 # This is the native arch of macos-14 runners
+            target_arch: "arm64"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive' # Ensure submodules like external/glfw are checked out if not using ExternalProject_Add for all
+
+    - name: Select Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 'latest' # Or specify a version like '15.0'
+
+    - name: Install CMake via Homebrew
+      run: brew install cmake
+
+    - name: Create build directory
+      run: cmake -E make_directory ${{ github.workspace }}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{ github.workspace }}/build
+      # Pass CMAKE_OSX_ARCHITECTURES based on the matrix.arch
+      # Also set SDKROOT to ensure correct SDK is used.
+      run: |
+        echo "Runner architecture: $(uname -m)"
+        echo "Target architecture for CMake: ${{ matrix.target_arch }}"
+        cmake .. -DCMAKE_BUILD_TYPE=Release \
+                 -DMGL_ENABLE_SANITIZER=ON \
+                 -DCMAKE_OSX_ARCHITECTURES="${{ matrix.target_arch }}" \
+                 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 # Set a reasonable deployment target
+        # Note: ExternalProject_Add might inherit these settings, but sometimes specific args are needed.
+
+    - name: Build project
+      shell: bash
+      working-directory: ${{ github.workspace }}/build
+      # Use $(sysctl -n hw.ncpu) for macOS to get core count for parallel build
+      run: cmake --build . --config Release -- -j $(sysctl -n hw.ncpu)
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ github.workspace }}/build
+      # CTEST_OUTPUT_ON_FAILURE=1 helps in debugging test failures in CI
+      run: CTEST_OUTPUT_ON_FAILURE=1 ctest --output-on-failure -C Release
