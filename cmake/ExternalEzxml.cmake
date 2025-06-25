@@ -5,19 +5,23 @@ ExternalProject_Add(ezxml_project
     SOURCE_DIR ${CMAKE_BINARY_DIR}/external/ezxml
     BINARY_DIR ${CMAKE_BINARY_DIR}/external/ezxml-build # Not a CMake project, so build dir might not be used in typical way
     CONFIGURE_COMMAND "" # No CMake/configure script
-    BUILD_COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} -c <SOURCE_DIR>/ezxml.c -o <BINARY_DIR>/ezxml.o
-    INSTALL_COMMAND ${CMAKE_AR} rcs <BINARY_DIR>/libezxml.a <BINARY_DIR>/ezxml.o && \
-                    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libezxml.a ${CMAKE_BINARY_DIR}/external/ezxml-install/lib/libezxml.a && \
-                    ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/ezxml.h ${CMAKE_BINARY_DIR}/external/ezxml-install/include/ezxml.h
-    # Create install directory for headers and library
+    # Step 1: Compile ezxml.c to an object file
+    BUILD_COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} -I<SOURCE_DIR> -c <SOURCE_DIR>/ezxml.c -o <BINARY_DIR>/ezxml.o
+    # Step 2: Create the static library
+    COMMAND ${CMAKE_AR} rcs <BINARY_DIR>/libezxml.a <BINARY_DIR>/ezxml.o
+    # Step 3: Create installation directories
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external/ezxml-install/lib
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external/ezxml-install/include
+    # Step 4: Install the library
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libezxml.a ${CMAKE_BINARY_DIR}/external/ezxml-install/lib/libezxml.a
+    # Step 5: Install the header
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/ezxml.h ${CMAKE_BINARY_DIR}/external/ezxml-install/include/ezxml.h
     LOG_DOWNLOAD ON
     LOG_BUILD ON
     LOG_INSTALL ON
 )
 
-set(EZXML_INSTALL_DIR ${CMAKE_BINARY_DIR}/external/ezxml-install)
+set(EZXML_INSTALL_DIR ${CMAKE_BINARY_DIR}/external/ezxml-install CACHE PATH "ezxml install directory")
 
 # Create imported target for ezxml library
 add_library(Ezxml::ezxml STATIC IMPORTED GLOBAL)
