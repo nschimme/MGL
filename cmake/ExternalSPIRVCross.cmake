@@ -56,6 +56,8 @@ add_dependencies(SPIRV-Cross::spirv-cross-reflect spirv_cross_project)
 
 
 # Interface target for include directories
+# Ensure the include directory exists at configure time to prevent errors when the interface target is defined.
+file(MAKE_DIRECTORY ${SPIRV_CROSS_INSTALL_DIR}/include)
 add_library(SPIRV-Cross INTERFACE IMPORTED GLOBAL)
 target_include_directories(SPIRV-Cross INTERFACE ${SPIRV_CROSS_INSTALL_DIR}/include)
 add_dependencies(SPIRV-Cross spirv_cross_project)

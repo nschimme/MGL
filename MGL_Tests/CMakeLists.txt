@@ -8,7 +8,10 @@ endif()
 # Gather test source files
 # Based on ls output: MGL_Tests/MGL_Tests.mm, MGL_Tests/MGL_test_utils.h, MGL_Tests/MGL_test_utils.mm
 # Make glob case-insensitive for the extension to be safe on different filesystems/checkouts.
+# CONFIGURE_DEPENDS ensures the glob is re-evaluated if the directory contents change,
+# which might help if files appear late in the configure stage (unlikely but for robustness).
 file(GLOB MGL_TEST_SOURCES
+    CONFIGURE_DEPENDS
     "*.mm"
     "*.MM"
     # "*.cpp" # Add if there are C++ test files

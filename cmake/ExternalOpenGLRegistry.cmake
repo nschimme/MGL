@@ -14,6 +14,9 @@ ExternalProject_Add(opengl_registry_project
 # Headers like glcorearb.h, gl.h, KHR/khrplatform.h are usually in a subdirectory like 'api'.
 # The spec_parser.c includes headers like "gl_core_3_3.h", which are generated into or exist in "api/GL/".
 # The KhronosGroup/OpenGL-Registry repository contains these under the "api/" directory.
+# Ensure the API directory path (used by the interface target) exists at configure time.
+# The actual files are downloaded by the ExternalProject_Add step during build.
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/external/OpenGL-Registry/api)
 add_library(OpenGL-Registry INTERFACE IMPORTED GLOBAL)
 target_include_directories(OpenGL-Registry INTERFACE
     ${CMAKE_BINARY_DIR}/external/OpenGL-Registry/api
