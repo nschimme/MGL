@@ -64,11 +64,12 @@ install(TARGETS spec_parser DESTINATION bin)
 
 # Add dependency on ezxml_project if spec_parser uses ezxml
 # Based on a quick look at spec_parser.c, it includes "ezxml.h".
-# It's not clear if it expects a local copy or the one from enum_parser or system.
-# Let's assume it should use the common `ezxml` we're building.
-find_package(Ezxml REQUIRED) # Ensure our ExternalEzxml.cmake has run and set up Ezxml::ezxml
+# The Ezxml::ezxml GLOBAL IMPORTED target is created by cmake/ExternalEzxml.cmake,
+# which is included in the root CMakeLists.txt before this file is processed.
+# So, we can directly link to it.
+target_include_directories(spec_parser PRIVATE ${EZXML_INCLUDE_DIR}) # Make sure ezxml.h is findable
 target_link_libraries(spec_parser PRIVATE Ezxml::ezxml)
-add_dependencies(spec_parser ezxml_project) # Explicit dependency on the project itself
+add_dependencies(spec_parser ezxml_project) # Ensure ezxml is built before spec_parser
 
 # Also, spec_parser.c includes "mgl_hacks.h", "gl_core_3_3.h", "gl_es_2_0.h", "gl_es_3_0.h", "gl_es_3_1.h", "gl_es_3_2.h"
 # These are not standard headers. They might be generated or come from OpenGL-Registry.

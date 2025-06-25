@@ -7,8 +7,10 @@ endif()
 
 # Gather test source files
 # Based on ls output: MGL_Tests/MGL_Tests.mm, MGL_Tests/MGL_test_utils.h, MGL_Tests/MGL_test_utils.mm
+# Make glob case-insensitive for the extension to be safe on different filesystems/checkouts.
 file(GLOB MGL_TEST_SOURCES
     "*.mm"
+    "*.MM"
     # "*.cpp" # Add if there are C++ test files
     # "*.c"   # Add if there are C test files
 )
