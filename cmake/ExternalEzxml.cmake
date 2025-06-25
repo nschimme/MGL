@@ -29,6 +29,7 @@ set_property(TARGET Ezxml::ezxml PROPERTY IMPORTED_LOCATION ${EZXML_INSTALL_DIR}
 add_dependencies(Ezxml::ezxml ezxml_project)
 
 # Interface target for include directories
+file(MAKE_DIRECTORY ${EZXML_INSTALL_DIR}/include) # Ensure directory exists at configure time
 add_library(Ezxml INTERFACE IMPORTED GLOBAL)
 target_include_directories(Ezxml INTERFACE ${EZXML_INSTALL_DIR}/include)
 add_dependencies(Ezxml ezxml_project)

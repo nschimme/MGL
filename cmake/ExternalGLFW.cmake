@@ -26,6 +26,7 @@ set_property(TARGET GLFW::glfw PROPERTY IMPORTED_LOCATION ${GLFW_INSTALL_DIR}/li
 add_dependencies(GLFW::glfw glfw_project)
 
 # Interface target for include directories
+file(MAKE_DIRECTORY ${GLFW_INSTALL_DIR}/include) # Ensure directory exists at configure time
 add_library(GLFW INTERFACE IMPORTED GLOBAL)
 target_include_directories(GLFW INTERFACE ${GLFW_INSTALL_DIR}/include)
 add_dependencies(GLFW glfw_project)

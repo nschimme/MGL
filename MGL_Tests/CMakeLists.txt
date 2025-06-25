@@ -7,19 +7,22 @@ endif()
 
 # Gather test source files
 # Based on ls output: MGL_Tests/MGL_Tests.mm, MGL_Tests/MGL_test_utils.h, MGL_Tests/MGL_test_utils.mm
-# Make glob case-insensitive for the extension to be safe on different filesystems/checkouts.
-# CONFIGURE_DEPENDS ensures the glob is re-evaluated if the directory contents change,
-# which might help if files appear late in the configure stage (unlikely but for robustness).
-file(GLOB MGL_TEST_SOURCES
-    CONFIGURE_DEPENDS
-    "*.mm"
-    "*.MM"
-    # "*.cpp" # Add if there are C++ test files
-    # "*.c"   # Add if there are C test files
+# Explicitly list known source files due to persistent issues with file(GLOB) in CI.
+# Based on previous `ls` output: MGL_Tests.mm, MGL_test_utils.mm
+set(MGL_TEST_SOURCES
+    "MGL_Tests.mm"
+    "MGL_test_utils.mm"
 )
 
-if(NOT MGL_TEST_SOURCES)
-    message(WARNING "No source files found for MGL_Tests. Test executable will not be built.")
+# Verify files exist - CMake will error here if they don't at configure time.
+foreach(src_file ${MGL_TEST_SOURCES})
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src_file}")
+        message(FATAL_ERROR "MGL_Tests: Source file ${src_file} not found in ${CMAKE_CURRENT_SOURCE_DIR}!")
+    endif()
+endforeach()
+
+if(NOT MGL_TEST_SOURCES) # Should not be strictly necessary if list is hardcoded and files exist
+    message(WARNING "No source files found for MGL_Tests (after explicit listing). Test executable will not be built.")
     return()
 endif()
 

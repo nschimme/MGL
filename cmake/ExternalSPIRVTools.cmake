@@ -46,6 +46,7 @@ set_property(TARGET SPIRV-Tools::SPIRV-Tools-lint PROPERTY IMPORTED_LOCATION ${S
 add_dependencies(SPIRV-Tools::SPIRV-Tools-lint spirv_tools_project)
 
 # Interface target for include directories
+file(MAKE_DIRECTORY ${SPIRV_TOOLS_INSTALL_DIR}/include) # Ensure directory exists at configure time
 add_library(SPIRV-Tools INTERFACE IMPORTED GLOBAL)
 target_include_directories(SPIRV-Tools INTERFACE ${SPIRV_TOOLS_INSTALL_DIR}/include)
 add_dependencies(SPIRV-Tools spirv_tools_project)

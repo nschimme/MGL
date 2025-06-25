@@ -62,6 +62,7 @@ add_dependencies(Glslang::GenericCodeGen glslang_project)
 
 
 # Interface target for include directories
+file(MAKE_DIRECTORY ${GLSLANG_INSTALL_DIR}/include) # Ensure directory exists at configure time
 add_library(Glslang INTERFACE IMPORTED GLOBAL)
 target_include_directories(Glslang INTERFACE ${GLSLANG_INSTALL_DIR}/include)
 add_dependencies(Glslang glslang_project)
